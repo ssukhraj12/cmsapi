@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Admin;
+use App\Http\Controllers\ApiController;
+use App\Http\Controllers\WebController;
 
 Route::post('/login',function (Request $request){
     $request->validate([
@@ -22,4 +24,14 @@ Route::post('/login',function (Request $request){
         'token_type' => 'bearer',
         'expires_in' => auth('api')->factory()->getTTL() * 60
     ]);
+});
+
+Route::middleware(['auth:api'])->get('/admin/me', function (Request $request) {
+    return response()->json($request->user());
+});
+
+Route::middleware(['auth:api'])->prefix('admin')->group(function () {
+    Route::get('/blogs',[ApiController::class,'getBlogs']);
+    Route::get('/galleries',[ApiController::class,'getGalleries']);
+    Route::get('/website',[ApiController::class,'getWebsite']);
 });
